@@ -13,11 +13,13 @@ Build Commands:
 
 3. To run maven build with integration tests:
 
-  > mvn clean install -P integration
+   > mvn clean install -P integration
 
 
 API:
 
 http://localhost:8081/txn-stats/transaction
+
 http://localhost:8081/txn-stats/statistics
+
 http://localhost:8081/txn-stats/statistics/{seconds}
