@@ -1,8 +1,6 @@
 package test.n26.exam.integration;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -19,7 +17,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +38,10 @@ public class TransactionStatisticsController_IntegrationTest extends Integration
 
         executeCreateTransactions(15, 2, 5);
 
-        getStatisticsForLastMinute();
+        Statistics stats = getStatisticsForLastMinute();
+
+        assertNotNull(stats);
+        assertTrue(stats.getCount() > 0);
     }
 
     @Test
@@ -49,7 +49,37 @@ public class TransactionStatisticsController_IntegrationTest extends Integration
 
         executeCreateTransactions(15, 2, 1);
 
-        getStatisticsForLastSeconds(10);
+        Statistics stats = getStatisticsForLastSeconds(10);
+
+        assertNotNull(stats);
+        assertTrue(stats.getCount() > 0);
+    }
+
+    @Test
+    public void getStatisticsWhenNoTransactionsExist() {
+
+        given()
+            .header("Accept","application/json")
+            .log().all()
+        .when()
+            .get( getUrlContextPathWithPort() + "/statistics")
+        .then()
+            .statusCode(404)
+            .log().all();
+    }
+
+    @Test
+    public void sendTransactionRequestWithMissingFields() {
+
+        given()
+            .contentType("application/json")
+            .body(new Transaction())
+            .log().all()
+        .when()
+            .post( getUrlContextPathWithPort() + "/transaction")
+        .then()
+            .statusCode(400)
+            .log().all();
     }
 
     private void executeCreateTransactions(int numberOfThreads,
@@ -79,7 +109,7 @@ public class TransactionStatisticsController_IntegrationTest extends Integration
         }
     }
 
-    private void getStatisticsForLastSeconds(int seconds) {
+    private Statistics getStatisticsForLastSeconds(int seconds) {
 
         ValidatableResponse response =
 
@@ -93,13 +123,11 @@ public class TransactionStatisticsController_IntegrationTest extends Integration
             .statusCode(200)
             .log().all();
 
-        Statistics stats = response.extract().body().as(Statistics.class);
+        return response.extract().body().as(Statistics.class);
 
-        assertNotNull(stats);
-        assertTrue(stats.getCount() > 0);
     }
 
-    private void getStatisticsForLastMinute() {
+    private Statistics getStatisticsForLastMinute() {
 
         ValidatableResponse response =
 
@@ -112,10 +140,8 @@ public class TransactionStatisticsController_IntegrationTest extends Integration
             .statusCode(200)
             .log().all();
 
-        Statistics stats = response.extract().body().as(Statistics.class);
+        return response.extract().body().as(Statistics.class);
 
-        assertNotNull(stats);
-        assertTrue(stats.getCount() > 0);
     }
 
     private void sendTransactions() {

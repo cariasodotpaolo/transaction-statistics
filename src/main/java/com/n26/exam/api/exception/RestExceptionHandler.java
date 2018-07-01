@@ -18,7 +18,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @ExceptionHandler( IllegalArgumentException.class )
+    @ExceptionHandler( value = { IllegalArgumentException.class, BadRequestException.class } )
     protected ResponseEntity<?> handleBadRequest(WebRequest request, Exception exception) {
         String userErrorMessage = "Please check your request details.";
 
@@ -56,7 +56,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
-    @ExceptionHandler( value = {NotFoundException.class, NoSuchElementException.class} )
+    @ExceptionHandler( value = { NotFoundException.class, NoSuchElementException.class} )
     protected ResponseEntity<?> handleNotFound(WebRequest request, Exception exception) {
 
         logger.error("NOT FOUND", exception);

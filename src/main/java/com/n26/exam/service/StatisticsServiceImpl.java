@@ -1,6 +1,6 @@
 package com.n26.exam.service;
 
-import com.n26.exam.data.TransactionContainer;
+import com.n26.exam.repository.TransactionRepository;
 import com.n26.exam.model.Statistics;
 import com.n26.exam.model.Transaction;
 import java.time.ZonedDateTime;
@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
 
-    private TransactionContainer transactionContainer;
+    private TransactionRepository transactionRepository;
 
     @Autowired
-    public StatisticsServiceImpl(TransactionContainer transactionContainer) {
-        this.transactionContainer = transactionContainer;
+    public StatisticsServiceImpl(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
 
         NavigableMap<ZonedDateTime, Transaction> transactions =
-                                    transactionContainer.getTransactionsFromLastMinute();
+                                    transactionRepository.getTransactionsFromLastMinute();
 
         DoubleSummaryStatistics stats = transactions.values().stream().
                                         mapToDouble((t) -> t.getAmount()).summaryStatistics();
@@ -38,7 +38,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
 
         NavigableMap<ZonedDateTime, Transaction> transactions =
-            transactionContainer.getTransactionsFromLastSeconds(seconds);
+            transactionRepository.getTransactionsFromLastSeconds(seconds);
 
         DoubleSummaryStatistics stats = transactions.values().stream().
             mapToDouble((t) -> t.getAmount()).summaryStatistics();

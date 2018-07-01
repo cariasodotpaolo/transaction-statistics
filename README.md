@@ -18,8 +18,28 @@ Build Commands:
 
 API:
 
-http://localhost:8081/txn-stats/transaction
+POST http://localhost:8081/txn-stats/transaction
 
-http://localhost:8081/txn-stats/statistics
+Request body:
+```
+{
+    "amount": 1.87,
+    "timestamp": 1530423160297
+}
+```
 
-http://localhost:8081/txn-stats/statistics/{seconds}
+--------------------------------------------
+
+GET http://localhost:8081/txn-stats/statistics (Returns statistics for last minute/ 60 seconds )
+GET http://localhost:8081/txn-stats/statistics/{seconds} (Returns statistics for user-defined interval in seconds)
+
+Response body:
+```
+{
+    "sum": 50.82,
+    "avg": 1.54,
+    "max": 1.96,
+    "min": 1.03,
+    "count": 33
+}
+```

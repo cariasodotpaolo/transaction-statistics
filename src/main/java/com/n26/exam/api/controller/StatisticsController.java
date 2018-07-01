@@ -1,5 +1,9 @@
 package com.n26.exam.api.controller;
 
+import static java.util.Objects.isNull;
+
+import com.n26.exam.api.exception.NotFoundException;
+import com.n26.exam.model.Statistics;
 import com.n26.exam.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,17 +24,27 @@ public class StatisticsController {
     }
 
     @RequestMapping(path = "/statistics", method = {RequestMethod.GET})
-    public ResponseEntity<?> getLastMinuteStats() {
+    public ResponseEntity<?> getLastMinuteStats() throws Exception {
 
-        return new ResponseEntity<>(statisticsService.getStatisticsFromLastMinute(), HttpStatus.OK);
+        Statistics statistics = statisticsService.getStatisticsFromLastMinute();
 
+        if (isNull(statistics) || statistics.getCount() == 0) {
+            throw new NotFoundException("No transactions found.");
+        }
+
+        return new ResponseEntity<>(statistics, HttpStatus.OK);
     }
 
     /* for testing only */
     @RequestMapping(path = "/statistics/{seconds}", method = {RequestMethod.GET})
-    public ResponseEntity<?> getLastSecondsStats(@PathVariable("seconds") Long seconds) {
+    public ResponseEntity<?> getLastSecondsStats(@PathVariable("seconds") Long seconds) throws Exception {
 
-        return new ResponseEntity<>(statisticsService.getStatisticsFromLastSeconds(seconds), HttpStatus.OK);
+        Statistics statistics = statisticsService.getStatisticsFromLastSeconds(seconds);
 
+        if (isNull(statistics) || statistics.getCount() == 0) {
+            throw new NotFoundException("No transactions found.");
+        }
+
+        return new ResponseEntity<>(statistics, HttpStatus.OK);
     }
 }

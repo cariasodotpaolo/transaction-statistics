@@ -1,6 +1,9 @@
 package com.n26.exam.api.controller;
 
 
+import static java.util.Objects.isNull;
+
+import com.n26.exam.api.exception.BadRequestException;
 import com.n26.exam.model.Transaction;
 import com.n26.exam.service.TransactionService;
 import java.time.LocalDateTime;
@@ -28,6 +31,11 @@ public class TransactionController {
 
     @RequestMapping(value = "/transaction", method = RequestMethod.POST)
     public ResponseEntity<?> addTransaction(@RequestBody Transaction transaction) throws Exception {
+
+        if(isNull(transaction) || isNull(transaction.getAmount()) || isNull(transaction.getTimestamp())) {
+            logger.error("Transaction request body or one of its fields is null.");
+            throw new BadRequestException("Transaction request is incorrect.");
+        }
 
         transactionService.add(transaction);
 

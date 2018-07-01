@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
-@ComponentScan("com.n26.exam.service")
+@ComponentScan("com.n26.exam")
 @EnableAsync
-public class AsyncConfig {
+public class ApplicationConfig {
 
 }

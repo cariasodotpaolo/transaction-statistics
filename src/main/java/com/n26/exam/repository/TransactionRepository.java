@@ -1,33 +1,25 @@
-package com.n26.exam.data;
+package com.n26.exam.repository;
 
 import com.n26.exam.model.Transaction;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class TransactionContainer {
+public class TransactionRepository {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     ConcurrentSkipListMap<ZonedDateTime, Transaction> transactions;
 
 
-    public TransactionContainer() {
+    public TransactionRepository() {
 
     }
 
