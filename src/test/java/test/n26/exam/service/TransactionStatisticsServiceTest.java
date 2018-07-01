@@ -1,5 +1,7 @@
 package test.n26.exam.service;
 
+import static org.junit.Assert.assertTrue;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.n26.exam.SpringBootMavenApplication;
@@ -10,7 +12,10 @@ import com.n26.exam.service.TransactionService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -89,5 +94,44 @@ public class TransactionStatisticsServiceTest {
 
         Statistics stats = statisticsService.getStatisticsFromLastSeconds(5L);
         logger.info("\n{}",jsonObjectMapper.writeValueAsString(stats));
+    }
+
+    @Test
+    public void testDateTimeRangeWithinInterval() {
+
+        int secondsBefore = 10;
+        int numberOfThreads = 15;
+
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+        Runnable producer = () -> IntStream
+            .rangeClosed(0, 4)
+            .forEach(index -> transactionService.add(
+                new Transaction(random.nextDouble(), LocalDateTime.now().minusSeconds(index)))
+            );
+
+        for (int i = 0; i < numberOfThreads; i++) {
+            executorService.execute(producer);
+
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        final ZonedDateTime timeStartMarker = ZonedDateTime.now().minusSeconds(secondsBefore);
+        final ZonedDateTime timeEndMarker = ZonedDateTime.now();
+
+        Set<ZonedDateTime> zdts = transactionService.getZoneDateTimeFromLastSeconds(secondsBefore);
+
+        System.out.println(String.format("\nSTART TIME MARKER: %s", timeStartMarker.format(DateTimeFormatter.ISO_TIME)));
+
+        zdts.stream().forEach(z -> {
+                assertTrue(z.isAfter(timeStartMarker) && z.isBefore(timeEndMarker));
+                System.out.println(String.format("\nTXN TIME: %s", z.format(DateTimeFormatter.ISO_TIME)));
+            }
+        );
+
+        System.out.println(String.format("\nEND TIME MARKER: %s", timeEndMarker.format(DateTimeFormatter.ISO_TIME)));
     }
 }

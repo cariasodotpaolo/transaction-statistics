@@ -45,7 +45,7 @@ public class TransactionStatisticsController_IntegrationTest extends Integration
     }
 
     @Test
-    public void testGetStatisticsForLastSeconds() {
+    public void testGetStatisticsForLastGivenSeconds() {
 
         executeCreateTransactions(15, 2, 1);
 
