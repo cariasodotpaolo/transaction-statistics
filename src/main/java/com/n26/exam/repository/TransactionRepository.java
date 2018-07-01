@@ -4,6 +4,7 @@ import com.n26.exam.model.Transaction;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import javax.annotation.PostConstruct;
@@ -48,8 +49,13 @@ public class TransactionRepository {
     /* used for testing */
     public ConcurrentNavigableMap<ZonedDateTime, Transaction> getTransactionsFromLastSeconds(Long seconds) {
 
-        logger.debug("\nSECONDS: {}", seconds);
         return transactions.tailMap(ZonedDateTime.now().minusSeconds(seconds));
+    }
+
+    /* used for testing */
+    public Set<ZonedDateTime> getZoneDateTimeFromLastSeconds(Long seconds) {
+
+        return transactions.tailMap(ZonedDateTime.now().minusSeconds(seconds)).keySet();
     }
 
 }
